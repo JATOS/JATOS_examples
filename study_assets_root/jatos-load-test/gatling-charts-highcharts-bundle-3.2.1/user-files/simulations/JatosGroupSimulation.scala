@@ -38,37 +38,35 @@ class JatosGroupSimulation extends Simulation {
 
 
   val scn = scenario("JatosGroupSimulation")
-    .exec(session => session.set("batchId", "2"))
-    .exec(session => session.set("studyId", "2"))
-    .exec(session => session.set("componentId1", "2"))
-    .exec(session => session.set("componentId2", "3"))
+    .exec(session => session.set("componentUuid1", "50e32e16-1831-495b-9826-f05e1eeccc87"))
+    .exec(session => session.set("componentUuid2", "cf187900-9e44-44b0-9e3d-779ba80ceaed"))
     .exec(
-      http("Start").get("/publix/${studyId}/start?batchId=${batchId}&generalMultiple").check(bodyString.saveAs("BODY")).headers(header_html)
+      http("Start").get("/publix/6BEbRemybjS").check(bodyString.saveAs("BODY")).headers(header_html)
     ).exec(getCookieValue(CookieKey("JATOS_IDS_0"))
   ).exec(session => {
     val cookie = session("JATOS_IDS_0").as[String]
     val cookieParas = parseUrlParameters(cookie)
-    val studyResultId = cookieParas("studyResultId")
-    println(s"JATOS_IDS_0: $studyResultId")
-    session.set("studyResultId", studyResultId)
+    val studyResultUuid = cookieParas("studyResultUuid")
+    println(s"JATOS_IDS_0: $studyResultUuid")
+    session.set("studyResultUuid", studyResultUuid)
   }).exec(
-    http("Get init data").get("/publix/${studyId}/${componentId1}/initData?srid=${studyResultId}").headers(header_json)
+    http("Get init data").get("/publix/${studyResultUuid}/${componentUuid1}/initData").headers(header_json)
   ).exec(
-    ws("Open batch channel").wsName("batchChannel").connect("/publix/${studyId}/batch/open?srid=${studyResultId}")
+    ws("Open batch channel").wsName("batchChannel").connect("/publix/${studyResultUuid}/batch/open")
   ).exec(
-    http("Heartbeat").post("/publix/${studyId}/heartbeat?srid=${studyResultId}").headers(header_ajax)
+    http("Heartbeat").post("/publix/${studyResultUuid}/heartbeat").headers(header_ajax)
   ).exec(
-    ws("Join group").wsName("groupChannel").connect("/publix/${studyId}/group/join?srid=${studyResultId}")
-//  ).pause(5 seconds).exec(
-//    http("Reassign group").get("/publix/${studyId}/group/reassign?srid=${studyResultId}").headers(header_ajax)
+    ws("Join group").wsName("groupChannel").connect("/publix/${studyResultUuid}/group/join")
   ).pause(5 seconds).exec(
-    http("Leave group").get("/publix/${studyId}/group/leave?srid=${studyResultId}").headers(header_ajax)
+    http("Reassign group").get("/publix/${studyResultUuid}/group/reassign").headers(header_ajax)
   ).pause(5 seconds).exec(
-    http("Post study session data").post("/publix/${studyId}/studySessionData?srid=${studyResultId}").headers(header_json).body(StringBody("""{"foo":"bar"}"""))
+    http("Leave group").get("/publix/${studyResultUuid}/group/leave").headers(header_ajax)
+  ).pause(5 seconds).exec(
+    http("Post study session data").post("/publix/${studyResultUuid}/studySessionData").headers(header_ajax).body(StringBody("""{"foo":"bar"}"""))
   ).exec(
-    http("Post results").post("/publix/${studyId}/${componentId1}/resultData?srid=${studyResultId}").headers(header_json).body(StringBody("""{"foo":"bar"}"""))
+    http("Post results").post("/publix/${studyResultUuid}/${componentUuid1}/resultData").headers(header_ajax).body(StringBody("""{"foo":"bar"}"""))
   ).exec(
-    http("Finish study").get("/publix/${studyId}/end?srid=${studyResultId}").headers(header_ajax)
+    http("Finish study").get("/publix/${studyResultUuid}/end").headers(header_ajax)
   ).exec(ws("Close batch channel").wsName("batchChannel").close)
 
   def parseUrlParameters(url: String) = {
@@ -78,9 +76,9 @@ class JatosGroupSimulation extends Simulation {
     }).toMap
   }
 
-  setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+//  setUp(scn.inject(atOnceUsers(2))).protocols(httpProtocol)
 //  setUp(scn.inject(rampUsersPerSec(0.2) to (0.2) during (600 seconds))).protocols(httpProtocol)
-//  setUp(scn.inject(constantConcurrentUsers(4) during (6000 seconds))).protocols(httpProtocol)
+  setUp(scn.inject(constantConcurrentUsers(7) during (100 seconds))).protocols(httpProtocol)
 //  setUp(scn.inject(rampConcurrentUsers(1) to (10) during (600 seconds))).protocols(httpProtocol)
 }
 

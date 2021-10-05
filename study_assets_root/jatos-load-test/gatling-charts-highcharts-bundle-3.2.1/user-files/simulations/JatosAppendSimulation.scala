@@ -13,10 +13,10 @@ class JatosAppendSimulation extends Simulation {
   val httpProtocol = http
 //    .baseUrl("https://jatos.mindprobe.eu")
 //    .wsBaseUrl("wss://jatos.mindprobe.eu")
-    .baseUrl("http://188.166.163.154")
-    .wsBaseUrl("ws://188.166.163.154")
-//    .baseUrl("http://127.0.0.1:9000")
-//    .wsBaseUrl("ws://127.0.0.1:9000")
+//    .baseUrl("http://188.166.163.154")
+//    .wsBaseUrl("ws://188.166.163.154")
+    .baseUrl("http://127.0.0.1:9000")
+    .wsBaseUrl("ws://127.0.0.1:9000")
     .inferHtmlResources()
     .acceptHeader("*/*")
     .acceptEncodingHeader("gzip, deflate")
@@ -40,35 +40,33 @@ class JatosAppendSimulation extends Simulation {
 
 
 
-  val scn = scenario("JatosDefaultSimulation")
-    .exec(session => session.set("batchId", "1"))
-    .exec(session => session.set("studyId", "1"))
-    .exec(session => session.set("componentId1", "1"))
-    .exec(session => session.set("componentId2", "2"))
+  val scn = scenario("JatosAppendSimulation")
+    .exec(session => session.set("componentUuid1", "50e32e16-1831-495b-9826-f05e1eeccc87"))
+    .exec(session => session.set("componentUuid2", "cf187900-9e44-44b0-9e3d-779ba80ceaed"))
 
 // ### 1. Component ###
   .exec(
-    http("Start").get("/publix/${studyId}/start?batchId=${batchId}&generalMultiple").check(bodyString.saveAs("BODY")).headers(header_html)
+    http("Start").get("/publix/6BEbRemybjS").check(bodyString.saveAs("BODY")).headers(header_html)
   ).exec(getCookieValue(CookieKey("JATOS_IDS_0"))
   ).exec(session => {
     val cookie = session("JATOS_IDS_0").as[String]
     val cookieParas = parseUrlParameters(cookie)
-    val studyResultId = cookieParas("studyResultId")
-    println(s"JATOS_IDS_0: ${studyResultId}")
-    session.set("studyResultId", studyResultId)
+    val studyResultUuid = cookieParas("studyResultUuid")
+    println(s"JATOS_IDS_0: $studyResultUuid")
+    session.set("studyResultUuid", studyResultUuid)
   }).exec(
-    http("Get init data").get("/publix/${studyId}/${componentId1}/initData?srid=${studyResultId}").headers(header_json)
+    http("Get init data").get("/publix/${studyResultUuid}/${componentUuid1}/initData").headers(header_json)
   ).exec(
-    ws("Open batch channel").wsName("batchChannel").connect("/publix/${studyId}/batch/open?srid=${studyResultId}")
+    ws("Open batch channel").wsName("batchChannel").connect("/publix/${studyResultUuid}/batch/open")
   ).exec(
-    http("Heartbeat").post("/publix/${studyId}/heartbeat?srid=${studyResultId}").headers(header_text)
+    http("Heartbeat").post("/publix/${studyResultUuid}/heartbeat").headers(header_text)
   ).exec(
-    ws("Join group").wsName("groupChannel").connect("/publix/${studyId}/group/join?srid=${studyResultId}")
+    ws("Join group").wsName("groupChannel").connect("/publix/${studyResultUuid}/group/join")
   ).exec(
-    http("Post study session data").post("/publix/${studyId}/studySessionData?srid=${studyResultId}").headers(header_ajax).body(StringBody("""{"foo":"bar"}"""))
+    http("Post study session data").post("/publix/${studyResultUuid}/studySessionData").headers(header_ajax).body(StringBody("""{"foo":"bar"}"""))
   ).repeat(500) {
 	pause(500 milliseconds).exec(
-        	http("Append result").post("/publix/${studyId}/${componentId1}/resultData?srid=${studyResultId}").headers(header_ajax).body(StringBody(Random.alphanumeric.take(10000).mkString("")))
+        	http("Append result").post("/publix/${studyResultUuid}/${componentUuid1}/resultData").headers(header_ajax).body(StringBody(Random.alphanumeric.take(10000).mkString("")))
 	)
     }
   .exec(ws("Close batch channel").wsName("batchChannel").close
@@ -76,23 +74,23 @@ class JatosAppendSimulation extends Simulation {
 
 // ### 2. Component ###
   .exec(
-    http("Next component").get("/publix/${studyId}/${componentId2}/start?srid=${studyResultId}&message=load%20test%20message%20%C2%A7%24%25%26").headers(header_html)
+    http("Next component").get("/publix/${studyResultUuid}/${componentUuid2}/start&message=load%20test%20message%20%C2%A7%24%25%26").headers(header_html)
   ).exec(
-    http("Get init data").get("/publix/${studyId}/${componentId2}/initData?srid=${studyResultId}").headers(header_json)
+    http("Get init data").get("/publix/${studyResultUuid}/${componentUuid2}/initData").headers(header_json)
   ).pause(1 seconds).exec(
-    ws("Open batch channel").wsName("batchChannel").connect("/publix/${studyId}/batch/open?srid=${studyResultId}")
+    ws("Open batch channel").wsName("batchChannel").connect("/publix/${studyResultUuid}/batch/open")
   ).exec(
-    http("Heartbeat").post("/publix/${studyId}/heartbeat?srid=${studyResultId}").headers(header_text)
+    http("Heartbeat").post("/publix/${studyResultUuid}/heartbeat").headers(header_text)
   ).pause(1 seconds).exec(
-    ws("Join group").wsName("groupChannel").connect("/publix/${studyId}/group/join?srid=${studyResultId}")
+    ws("Join group").wsName("groupChannel").connect("/publix/${studyResultUuid}/group/join")
   ).pause(1 seconds).exec(
-    http("Post result").post("/publix/${studyId}/${componentId2}/resultData?srid=${studyResultId}").headers(header_ajax).body(StringBody(Random.alphanumeric.take(5000000).mkString("")))
+    http("Post result").post("/publix/${studyResultUuid}/${componentUuid2}/resultData").headers(header_ajax).body(StringBody(Random.alphanumeric.take(5000000).mkString("")))
   ).pause(1 seconds).exec(
-    http("Leave group").get("/publix/${studyId}/group/leave?srid=${studyResultId}").headers(header_ajax)
+    http("Leave group").get("/publix/${studyResultUuid}/group/leave").headers(header_ajax)
   ).pause(1 seconds).exec(
-    http("Post study session data").post("/publix/${studyId}/studySessionData?srid=${studyResultId}").headers(header_json).body(StringBody("""{"foo":"bar"}"""))
+    http("Post study session data").post("/publix/${studyResultUuid}/studySessionData").headers(header_json).body(StringBody("""{"foo":"bar"}"""))
   ).exec(
-    http("Finish study").get("/publix/${studyId}/end?srid=${studyResultId}").headers(header_ajax)
+    http("Finish study").get("/publix/${studyResultUuid}/end").headers(header_ajax)
   ).exec(ws("Close batch channel").wsName("batchChannel").close)
 
   def parseUrlParameters(url: String) = {
