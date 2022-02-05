@@ -44,11 +44,3 @@ body {
 	top: 1em;
 	right: 1em;
 }
-
-#quit {
-	cursor:pointer;
-	padding: 0;
-	position:absolute;
-	bottom: 1em;
-	right: 1em;
-}
