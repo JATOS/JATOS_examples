@@ -100,7 +100,7 @@
             testVar(jatos.studyProperties.locked, "jatos.studyProperties.locked", false);
             testVar(jatos.studyProperties.title, "jatos.studyProperties.title", "jatos.js Test Stüdy (你经常来吗)");
             testVarJson(jatos.studySessionData, "jatos.studySessionData");
-            jatos.componentList.length === 2 ? addSuccess("jatos.componentList") : addFail("jatos.componentList");
+            jatos.componentList.length === 3 ? addSuccess("jatos.componentList") : addFail("jatos.componentList");
             testVarJson(jatos.componentJsonInput, "jatos.componentJsonInput",
                 '{"ca":"test","cb":5,"cc":[1,2,3],"cd":{"ce":"foo","cf":"אבטיח"}}');
             testVar(jatos.componentPos, "jatos.componentPos", 1);
