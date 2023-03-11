@@ -14,6 +14,7 @@
 
     /* initialize jsPsych */
     var jsPsych = initJsPsych({
+      on_trial_start: jatos.addAbortButton,
       on_finish: () => jatos.endStudy(jsPsych.data.get().json())
     });
 
@@ -116,7 +117,6 @@
 
     /* start the experiment */
     jatos.onLoad(() => {
-      jatos.addAbortButton();
       jsPsych.run(timeline);
     });
 

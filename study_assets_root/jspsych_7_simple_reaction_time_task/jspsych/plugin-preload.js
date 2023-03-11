@@ -218,7 +218,7 @@ var jsPsychPreload = (function (jspsych) {
               // show detailed errors, if necessary
               if (trial.show_detailed_errors) {
                   display_element.innerHTML += "<p><strong>Error details:</strong></p>";
-                  detailed_errors.forEach(function (e) {
+                  detailed_errors.forEach((e) => {
                       display_element.innerHTML += e;
                   });
               }
@@ -258,13 +258,13 @@ var jsPsychPreload = (function (jspsych) {
                   this.jsPsych.pluginAPI.preloadImages(images, cb, file_loading_success, file_loading_error);
               };
               if (video.length > 0) {
-                  load_video(function () { });
+                  load_video(() => { });
               }
               if (audio.length > 0) {
-                  load_audio(function () { });
+                  load_audio(() => { });
               }
               if (images.length > 0) {
-                  load_images(function () { });
+                  load_images(() => { });
               }
           }
           // helper functions and callbacks
@@ -360,6 +360,35 @@ var jsPsychPreload = (function (jspsych) {
                   trial.on_success(source);
               }
           }
+      }
+      simulate(trial, simulation_mode, simulation_options, load_callback) {
+          if (simulation_mode == "data-only") {
+              load_callback();
+              this.simulate_data_only(trial, simulation_options);
+          }
+          if (simulation_mode == "visual") {
+              this.simulate_visual(trial, simulation_options, load_callback);
+          }
+      }
+      create_simulation_data(trial, simulation_options) {
+          const default_data = {
+              success: true,
+              timeout: false,
+              failed_images: [],
+              failed_audio: [],
+              failed_video: [],
+          };
+          const data = this.jsPsych.pluginAPI.mergeSimulationData(default_data, simulation_options);
+          return data;
+      }
+      simulate_data_only(trial, simulation_options) {
+          const data = this.create_simulation_data(trial, simulation_options);
+          this.jsPsych.finishTrial(data);
+      }
+      simulate_visual(trial, simulation_options, load_callback) {
+          const display_element = this.jsPsych.getDisplayElement();
+          this.trial(display_element, trial);
+          load_callback();
       }
   }
   PreloadPlugin.info = info;
