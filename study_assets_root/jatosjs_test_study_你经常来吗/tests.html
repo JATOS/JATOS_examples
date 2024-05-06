@@ -427,16 +427,16 @@
 
         function testAppendResultData() {
             var promise1 = jatos.appendResultData(" ... append 1");
-            var promise2 = jatos.appendResultData(" ... append 2");
-            var promise3 = jatos.appendResultData(" ... append 3");
-            var promise4 = jatos.appendResultData(" ... append 4");
-            var promise5 = jatos.appendResultData(" ... append 5");
-            var promise6 = jatos.appendResultData(" ... append 6");
-            var promise7 = jatos.appendResultData(" ... append 7");
-            var promise8 = jatos.appendResultData(" ... append 8");
-            var promise9 = jatos.appendResultData(" ... append 9 你经常来这吗");
-            var promise10 = jatos.appendResultData(" ... append 10 😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧 ... ");
-            var obj = { "obj": "append 11" };
+            var promise2 = jatos.appendResultData(" ... <b>append 2 with HTML tags</b>"); // Should not cause bold text
+            var promise3 = jatos.appendResultData(" ... append 3 with HTML closing tag </pre>"); // Should not interfere with JATOS UI
+            var promise4 = jatos.appendResultData(' ... append 4 with HTML link <a href="http://jatos.org"></a>'); // Should not show link in JATOS UI
+            var promise5 = jatos.appendResultData(" ... append 5 with \n line break \\n"); // Should not break line in JATOS UI, but if copy-pasted to editor
+            var promise6 = jatos.appendResultData(" ... append 6 with special characters §$%&/(){}[]?~*#:;|@€"); // Should be shown as it is
+            var promise7 = jatos.appendResultData(" ... {append 7 as pseudo JSON object: 5}"); // Should be shown as it is
+            var promise8 = jatos.appendResultData(" ... append 8 with Mandarin 你经常来这吗"); // Should be shown as it is
+            var promise9 = jatos.appendResultData(" ... append 9 with Arabic يخبر"); // Should be shown as it is
+            var promise10 = jatos.appendResultData(" ... append 10 with emojis 😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧 ... "); // Should be shown as it is
+            var obj = { "obj": "append 11 as JSON object" };  // Should be shown as stringified object (JSON)
             var promise11 = jatos.appendResultData(obj);
 
             return Promise.all([promise1, promise2, promise3, promise4, promise5, promise6, promise7, promise8, promise9, promise10, promise11])
@@ -447,7 +447,7 @@
         function testAppendLargeResultData() {
             var promises = [];
             for (i = 0; i < 10; i++) {
-                promises.push(jatos.appendResultData("\nappend large " + i + " - " + generateRandomString(5000)));
+                promises.push(jatos.appendResultData("\n ... append large " + i + " - " + generateRandomString(5000))); // Should be shown in a new line with a random string of 5000 chars
             }
             return Promise.all(promises)
                 .then(() => addSuccess("jatos.appendLargeResultData"))
