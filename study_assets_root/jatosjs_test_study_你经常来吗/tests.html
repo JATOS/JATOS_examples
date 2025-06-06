@@ -2,35 +2,27 @@
 <html>
 
 <head>
-    <script src="libs/jquery-1.11.1.min.js"></script>
+    <script src="libs/jquery-3.7.1.min.js"></script>
     <script src="jatos.js"></script>
 </head>
 
 <body>
-    <button id="startNextComponent"
-        onclick="jatos.startNextComponent(' ... append before jatos.startNextComponent', 'msg via message parameter')">jatos.startNextComponent</button>
-    <button id="startLastComponent"
-        onclick="jatos.startLastComponent(' ... append before jatos.startLastComponent', 'msg via message parameter')">jatos.startLastComponent</button>
-    <button id="startComponentByPos"
-        onclick="jatos.startComponentByPos(2, ' ... append before jatos.startComponentByPos', 'msg via message parameter')">jatos.startComponentByPos</button>
-    <button id="startComponentByTitle"
-        onclick="jatos.startComponentByTitle('Second', ' ... append before jatos.startComponentByTitle', 'msg via message parameter')">jatos.startComponentByTitle</button>
-    <button id="startComponentByUuid" onclick="jatos.startComponent('96cfc6e4-8e78-4f02-9afb-5075171d0222')">jatos.startComponentByUuid</button>
-    <button id="abortStudyAjax" onclick="callAbortStudyAjax()">jatos.abortStudyAjax</button>
-    <button id="abortStudy" onclick="jatos.abortStudy('Test study was aborted')">jatos.abortStudy</button>
-    <button id="endStudyAjax" onclick="callEndStudyAjax()">jatos.endStudyAjax</button>
-    <button id="endStudyNoShowEndPage"
-        onclick="jatos.endStudy({obj:'endStudy noshowendpage append'}, true, 'Test study was finished via Ajax and no end page shown', false)">jatos.endStudy
-        no end page</button>
-    <button id="endStudy"
-        onclick="jatos.endStudy({obj:'endStudy append'}, true, 'Test study was finished (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')">jatos.endStudy</button>
-    <button id="endStudy"
-        onclick="jatos.endStudyAndRedirect('http\:\/\/jatos.org', {obj:'endStudyAndRedirect append'}, true, 'Test study was finished (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')">jatos.endStudyAndRedirect</button>
+    <button onclick="jatos.startNextComponent(' ... append before jatos.startNextComponent', 'msg via message parameter')">jatos.startNextComponent</button>
+    <button onclick="jatos.startLastComponent(' ... append before jatos.startLastComponent', 'msg via message parameter')">jatos.startLastComponent</button>
+    <button onclick="jatos.startComponentByPos(2, ' ... append before jatos.startComponentByPos', 'msg via message parameter')">jatos.startComponentByPos</button>
+    <button onclick="jatos.startComponentByTitle('Second', ' ... append before jatos.startComponentByTitle', 'msg via message parameter')">jatos.startComponentByTitle</button>
+    <button onclick="jatos.startComponent('96cfc6e4-8e78-4f02-9afb-5075171d0222')">jatos.startComponentByUuid</button>
+    <button onclick="callAbortStudyWithoutRedirect()">jatos.abortStudyWithoutRedirect</button>
+    <button onclick="jatos.abortStudy('Test study was aborted')">jatos.abortStudy</button>
+    <button onclick="jatos.abortStudy('Test study was aborted', false)">jatos.abortStudy no end page</button>
+    <button onclick="jatos.abortStudyAndRedirect('http\:\/\/jatos.org', 'Test study was aborted (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')">jatos.abortStudyAndRedirect</button>
+    <button onclick="callEndStudyWithoutRedirect()">jatos.endStudyWithoutRedirect</button>
+    <button onclick="jatos.endStudy({obj:'endStudy noshowendpage append'}, true, 'Test study was finished without redirect and no end page shown', false)">jatos.endStudy no end page</button>
+    <button onclick="jatos.endStudy({obj:'endStudy append'}, true, 'Test study was finished (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')">jatos.endStudy</button>
+    <button onclick="jatos.endStudyAndRedirect('http\:\/\/jatos.org', {obj:'endStudyAndRedirect append'}, true, 'Test study was finished (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')">jatos.endStudyAndRedirect</button>
     <p>This is the first component.</p>
-    <p class="test">Loading study assets with absolute path: <img id="imgAbsolutePath" src=""
-            alt="Not loaded img with absolute path" height="42" width="42"></p>
-    <p class="test">Loading study assets with relative path: <img id="imgRelativePath" src="你经常来这吗.png"
-            alt="Not loaded img with relative path" height="42" width="42"></p>
+    <p class="test">Loading study assets with absolute path: <img id="imgAbsolutePath" src="" alt="Not loaded img with absolute path" height="42" width="42"></p>
+    <p class="test">Loading study assets with relative path: <img id="imgRelativePath" src="你经常来这吗.png" alt="Not loaded img with relative path" height="42" width="42"></p>
 
     <script type="text/javascript">
         jatos.catchAndLogErrors();
@@ -86,27 +78,22 @@
             testVar(jatos.httpTimeout, "jatos.httpTimeout", 30000);
             testVar(jatos.httpRetry, "jatos.httpRetry", 5);
             testVar(jatos.httpRetryWait, "jatos.httpRetryWait", 1000);
-            testVarJson(jatos.studyJsonInput, "jatos.studyJsonInput",
-                '{"sa":"test","sb":5,"sc":[1,2,3],"sd":{"se":"foo","sf":"אבטיח"}}');
+            testVarJson(jatos.studyJsonInput, "jatos.studyJsonInput", '{"sa":"test","sb":5,"sc":[1,2,3],"sd":{"se":"foo","sf":"אבטיח"}}');
             testVar(jatos.studyLength, "jatos.studyLength", 3);
             testVar(jatos.studyProperties.id, "jatos.studyProperties.id");
             testVar(jatos.studyProperties.uuid, "jatos.studyProperties.uuid", "79d0a52a-d5d3-4461-9d9b-6fd9f386c04a");
-            testVar(jatos.studyProperties.description, "jatos.studyProperties.description",
-                "Tests for JATOS' jatos.js development (אבטיח)");
-            testVar(jatos.studyProperties.descriptionHash, "jatos.studyProperties.descriptionHash",
-                "ae880f0b46a4a1dddd30c278752358c14078562528fe6b33d6cbed3fe7e4195e");
+            testVar(jatos.studyProperties.description, "jatos.studyProperties.description", "Tests for JATOS' jatos.js development (אבטיח)");
+            testVar(jatos.studyProperties.descriptionHash, "jatos.studyProperties.descriptionHash", "ae880f0b46a4a1dddd30c278752358c14078562528fe6b33d6cbed3fe7e4195e");
             testVar(jatos.studyProperties.dirName, "jatos.studyProperties.dirName", "jatosjs_test_study_你经常来吗");
             testVar(jatos.studyProperties.groupStudy, "jatos.studyProperties.groupStudy", true);
             testVar(jatos.studyProperties.locked, "jatos.studyProperties.locked", false);
             testVar(jatos.studyProperties.title, "jatos.studyProperties.title", "jatos.js Test Stüdy (你经常来吗)");
             testVarJson(jatos.studySessionData, "jatos.studySessionData");
             jatos.componentList.length === 3 ? addSuccess("jatos.componentList") : addFail("jatos.componentList");
-            testVarJson(jatos.componentJsonInput, "jatos.componentJsonInput",
-                '{"ca":"test","cb":5,"cc":[1,2,3],"cd":{"ce":"foo","cf":"אבטיח"}}');
+            testVarJson(jatos.componentJsonInput, "jatos.componentJsonInput", '{"ca":"test","cb":5,"cc":[1,2,3],"cd":{"ce":"foo","cf":"אבטיח"}}');
             testVar(jatos.componentPos, "jatos.componentPos", 1);
             testVar(jatos.componentProperties.id, "jatos.componentProperties.id");
-            testVar(jatos.componentProperties.uuid, "jatos.componentProperties.uuid",
-                "15287b49-d9e1-4d20-85c8-a412c9ac2075");
+            testVar(jatos.componentProperties.uuid, "jatos.componentProperties.uuid", "15287b49-d9e1-4d20-85c8-a412c9ac2075");
             testVar(jatos.componentProperties.title, "jatos.componentProperties.title", "Tests");
             testVar(jatos.componentProperties.htmlFilePath, "jatos.componentProperties.htmlFilePath", "tests.html");
             testVar(jatos.componentProperties.reloadable, "jatos.componentProperties.reloadable", true);
@@ -115,10 +102,8 @@
             testVar(jatos.batchProperties.maxActiveMembers, "jatos.batchProperties.maxActiveMembers", 1);
             testVar(jatos.batchProperties.maxTotalMembers, "jatos.batchProperties.maxTotalMembers", null);
             testVar(jatos.batchProperties.maxTotalWorkers, "jatos.batchProperties.maxTotalWorkers", null);
-            testVarJson(jatos.batchProperties.allowedWorkerTypes, "jatos.batchProperties.allowedWorkerTypes",
-                '["PersonalSingle","Jatos","PersonalMultiple"]');
-            testVarJson(jatos.batchJsonInput, "jatos.batchJsonInput",
-                '{"a":"test","b":5,"c":[1,2,3],"d":{"e":"foo","f":"bla"}}');
+            testVarJson(jatos.batchProperties.allowedWorkerTypes, "jatos.batchProperties.allowedWorkerTypes", '["PersonalSingle","Jatos","PersonalMultiple"]');
+            testVarJson(jatos.batchJsonInput, "jatos.batchJsonInput", '{"a":"test","b":5,"c":[1,2,3],"d":{"e":"foo","f":"bla"}}');
             testVarJson(jatos.groupMemberId, "jatos.groupMemberId");
             testVarJson(jatos.groupResultId, "jatos.groupResultId");
             testVarJson(jatos.groupMembers, "jatos.groupMembers");
@@ -430,7 +415,7 @@
             var promise2 = jatos.appendResultData(" ... <b>append 2 with HTML tags</b>"); // Should not cause bold text
             var promise3 = jatos.appendResultData(" ... append 3 with HTML closing tag </pre>"); // Should not interfere with JATOS UI
             var promise4 = jatos.appendResultData(' ... append 4 with HTML link <a href="http://jatos.org"></a>'); // Should not show link in JATOS UI
-            var promise5 = jatos.appendResultData(" ... append 5 with \n line break \\n"); // Should not break line in JATOS UI, but if copy-pasted to editor
+            var promise5 = jatos.appendResultData(" ... append 5 with \n\t line break \\n\\t"); // \n\t should break line and show a tab in the next line in JATOS UI and if copy-pasted to editor
             var promise6 = jatos.appendResultData(" ... append 6 with special characters §$%&/(){}[]?~*#:;|@€"); // Should be shown as it is
             var promise7 = jatos.appendResultData(" ... {append 7 as pseudo JSON object: 5}"); // Should be shown as it is
             var promise8 = jatos.appendResultData(" ... append 8 with Mandarin 你经常来这吗"); // Should be shown as it is
@@ -469,10 +454,10 @@
                 .catch(() => addFail("jatos.setStudySessionData"));
         }
 
-        function testAbortStudyAjax() {
-            jatos.abortStudyAjax("Let us abort the study")
-                .then(() => addSuccess("jatos.abortStudyAjax"))
-                .catch(() => addFail("jatos.abortStudyAjax"));
+        function testAbortStudyWithoutRedirect() {
+            jatos.abortStudyWithoutRedirect("Let us abort the study")
+                .then(() => addSuccess("jatos.abortStudyWithoutRedirect"))
+                .catch(() => addFail("jatos.abortStudyWithoutRedirect"));
         }
 
         function testUpload() {
@@ -559,16 +544,16 @@
             testVar($("p.test").length, "Check test number", 87);
         }
 
-        function callEndStudyAjax() {
-            jatos.endStudyAjax({ obj: 'endStudyAjax append' }, true, 'Test study was finished via Ajax (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')
-                .then(() => console.log('jatos.endStudyAjax - success'))
-                .catch(() => console.log('jatos.endStudyAjax - fail'));
+        function callEndStudyWithoutRedirect() {
+            jatos.endStudyWithoutRedirect({ obj: 'endStudyWithoutRedirect append' }, true, 'Test study was finished without a redirect (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')
+                .then(() => console.log('jatos.endStudyWithoutRedirect - success'))
+                .catch(() => console.log('jatos.endStudyWithoutRedirect - fail'));
         }
 
-        function callAbortStudyAjax() {
-            jatos.abortStudyAjax('Test study was aborted via an Ajax call (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')
-                .then(() => console.log('jatos.abortStudyAjax - success'))
-                .catch((error) => console.log('jatos.abortStudyAjax - fail'));
+        function callAbortStudyWithoutRedirect() {
+            jatos.abortStudyWithoutRedirect('Test study was aborted without a redirect (😼🙀🧞‍♀️🤹‍♀️👨‍👨‍👧‍👧)')
+                .then(() => console.log('jatos.abortStudyWithoutRedirect - success'))
+                .catch((error) => console.log('jatos.abortStudyWithoutRedirect - fail'));
         }
 
     </script>
