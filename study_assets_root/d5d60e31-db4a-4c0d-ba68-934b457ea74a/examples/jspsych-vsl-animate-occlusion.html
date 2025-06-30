@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="jatos.js"></script>
+    <script src="examples/js/snap.svg-min.js"></script>
+    <script src="dist/jspsych.js"></script>
+    <script src="dist/plugin-vsl-animate-occlusion.js"></script>
+    <script src="dist/plugin-preload.js"></script>
+    <link rel="stylesheet" href="dist/jspsych.css">
+  </head>
+  <body></body>
+  <script>
+
+    var jsPsych = initJsPsych({
+      on_finish: function() {
+        jatos.startNextComponent(jsPsych.data.get().json());
+      }
+    });
+
+    var images = ["examples/img/1.gif", "examples/img/2.gif", "examples/img/3.gif", "examples/img/4.gif", "examples/img/5.gif", "examples/img/6.gif", "examples/img/7.gif", "examples/img/8.gif", "examples/img/9.gif", "examples/img/10.gif"];
+
+    var preload = {
+      type: jsPsychPreload,
+      auto_preload: true
+    };
+
+    var block = {
+      type: jsPsychVslAnimateOcclusion,
+      stimuli: images
+    };
+
+    jatos.onLoad(() => {
+      jsPsych.run([preload, block]);
+    });
+
+  </script>
+</html>

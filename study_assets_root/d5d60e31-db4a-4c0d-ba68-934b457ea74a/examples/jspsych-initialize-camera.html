@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="jatos.js"></script>
+  <script src="dist/jspsych.js"></script>
+  <script src="dist/plugin-initialize-camera.js"></script>
+  <link rel="stylesheet" href="dist/jspsych.css">
+</head>
+<body></body>
+<script>
+
+  var jsPsych = initJsPsych();
+
+  let init_camera = {
+    type: jsPsychInitializeCamera,
+  }
+
+  jatos.onLoad(() => {
+    jsPsych.run([init_camera]);
+  });
+
+</script>
+</html>

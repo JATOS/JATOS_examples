@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="jatos.js"></script>
+    <script src="dist/jspsych.js"></script>
+    <script src="dist/plugin-maxdiff.js"></script>
+    <link rel="stylesheet" href="dist/jspsych.css">
+  </head>
+  <body></body>
+  <script>
+
+    var jsPsych = initJsPsych({
+      on_finish: function() {
+        jatos.startNextComponent(jsPsych.data.get().json());
+      }
+    });
+
+    var maxdiff_trial = {
+      type: jsPsychMaxdiff,
+      alternatives: ['apple', 'orange', 'pear', 'banana'],
+      labels: ['Most Preferred', 'Least Preferred'],
+      preamble: '<p> Please select your <b>most preferred</b> and <b>least preferred</b> fruits. </p>'
+    };
+
+    var maxdiff_trial_random_required = {
+      type: jsPsychMaxdiff,
+      alternatives: ['strawberry', 'watermelon', 'kiwi', 'grapefruit'],
+      labels: ['Most Preferred', 'Least Preferred'],
+      preamble: '<p> Please select your <b>most preferred</b> and <b>least preferred</b> fruits. </p>',
+      randomize_alternative_order: true,
+      required: true
+    };
+
+    jatos.onLoad(() => {
+      jsPsych.run([maxdiff_trial, maxdiff_trial_random_required]);
+    });
+
+  </script>
+</html>

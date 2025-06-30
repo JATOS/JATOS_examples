@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="jatos.js"></script>
+    <script src="dist/jspsych.js"></script>
+    <script src="dist/plugin-html-keyboard-response.js"></script>
+    <script src="dist/plugin-image-keyboard-response.js"></script>
+    <script src="dist/plugin-preload.js"></script>
+    <link rel="stylesheet" href="dist/jspsych.css">
+  </head>
+  <body></body>
+  <script>
+
+    var jsPsych = initJsPsych({
+      on_finish: function() {
+        jatos.startNextComponent(jsPsych.data.get().json());
+      }
+    });
+
+    var preload = {
+      type: jsPsychPreload,
+      images: ['examples/img/happy_face_4.jpg']
+    };
+
+    var first = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: 'First trial; new trial added when on_finish is called.',
+      on_finish: function(){
+        jsPsych.addNodeToEndOfTimeline({
+          timeline: [{
+            type: jsPsychImageKeyboardResponse,
+            stimulus: 'examples/img/happy_face_4.jpg',
+            stimulus_width: 300,
+            prompt: '<p>New trial.</p>'
+          }]
+        });
+      }
+    };
+
+    jatos.onLoad(() => {
+      jsPsych.run([preload, first]);
+    });
+  </script>
+</html>
