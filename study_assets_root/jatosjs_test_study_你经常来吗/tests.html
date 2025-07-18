@@ -103,7 +103,7 @@
             testVar(jatos.batchProperties.maxActiveMembers, "jatos.batchProperties.maxActiveMembers", 1);
             testVar(jatos.batchProperties.maxTotalMembers, "jatos.batchProperties.maxTotalMembers", null);
             testVar(jatos.batchProperties.maxTotalWorkers, "jatos.batchProperties.maxTotalWorkers", null);
-            testVarJson(jatos.batchProperties.allowedWorkerTypes, "jatos.batchProperties.allowedWorkerTypes", '["PersonalSingle","PersonalMultiple"]');
+            testVarJson(jatos.batchProperties.allowedWorkerTypes, "jatos.batchProperties.allowedWorkerTypes", '["PersonalSingle","Jatos","GeneralMultiple","PersonalMultiple"]');
             testVarJson(jatos.batchInput, "jatos.batchJsonInput", '{"a":"test","b":5,"c":[1,2,3],"d":{"e":"foo","f":"bla"}}');
             testObjectEquality(jatos.batchInput, jatos.batchJsonInput, "jatos.batchInput == jatos.batchJsonInput");
             testVarJson(jatos.groupMemberId, "jatos.groupMemberId");
