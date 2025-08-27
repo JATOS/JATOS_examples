@@ -281,7 +281,7 @@
 		function onEndStudy() {
 			var gameResults = collectGameResults();
 			var resultJson = JSON.stringify(gameResults);
-			jatos.startNextComponent(resultJson).fail(console.log);
+			jatos.endStudy(resultJson);
 		}
 
 		function collectGameResults() {
