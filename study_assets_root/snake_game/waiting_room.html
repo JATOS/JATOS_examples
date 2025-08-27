@@ -3,7 +3,7 @@
 <head>
 <link rel="stylesheet" href="libs/pure-release-0.6.0/pure-min.css">
 <link rel="stylesheet" type="text/css" href="css/waiting_room.css" />
-<script	src="libs/jquery-1.11.1.min.js"></script>
+<script	src="libs/jquery-3.7.1.min.js"></script>
 <script src="jatos.js"></script>    
 </head>
 <body>
@@ -14,11 +14,12 @@
 	</div>
 	<div id="buttonRow" class="pure-u-1-1">
 		<button id="joinButton" class="buttonJoin pure-button" onclick="onJoinButton()" disabled>Join Group</button>
-		<button id="leaveButton" class="buttonLeave pure-button" onclick="onLeaveButton()">Leave Group</button>
+		<button id="reassignButton" class="buttonLeave pure-button" onclick="onReassignButton()">Reassign</button>
 		<button id="readyButton" class="buttonReady pure-button" onclick="onReadyButton()" disabled>Ready?</button>
 	</div>
 	<div id="memberCounterRow" class="pure-u-1-1">
-		<p><span id="memberCounter">0</span>&nbsp;Members</p>
+		<div><span id="memberCounter">0</span>&nbsp;Member(s)</div>
+		<div>in group&nbsp;<span id="groupId">?</span></div>
 	</div>
 </div>
 
@@ -44,7 +45,7 @@ function onJoinButton() {
 // What should happen when we successfully joined a group and opened the group channel
 function onOpen() {
 	$('#joinButton').hide();
-	$('#leaveButton').show();
+	$('#reassignButton').show();
 	$('#readyButton').prop('disabled', true);
 	showMemberStatus();
 	waitOrGoOn();
@@ -66,7 +67,7 @@ function waitOrGoOn() {
 
 function onGroupWaiting() {
 	$('#joinButton').hide();
-	$('#leaveButton').show();
+	$('#reassignButton').show();
 	$('#readyButton').prop('disabled', true);
 	showMemberStatus();
 }
@@ -74,7 +75,7 @@ function onGroupWaiting() {
 // What should happen when the group has found its members and each member has an open group channel
 function onGroupOpen() {
 	$('#joinButton').hide();
-	$('#leaveButton').show();
+	$('#reassignButton').show();
 	$('#readyButton').prop('disabled', false);
 	showMemberStatus();
 	playDingSound();
@@ -97,17 +98,18 @@ function onMemberLeave(groupMemberId) {
 }
 
 // What should happen after the leave button was pressed: leave the group
-function onLeaveButton() {
-	jatos.leaveGroup(showMemberStatus);
+function onReassignButton() {
+	jatos.reassignGroup(showMemberStatus);
 	$('#statusText').html("&nbsp;");
 	$('#joinButton').show();
-	$('#leaveButton').hide();
+	$('#reassignButton').hide();
 	$('#readyButton').prop('disabled', true);
 }
 
 function showMemberStatus() {
 	if (jatos.groupChannels && jatos.groupChannels.length > 0) {
 		$('#memberCounter').text(jatos.groupChannels.length).show();
+		$('#groupId').text(jatos.groupResultId).show();
 		var num = jatos.studyJsonInput.minActiveMembers - jatos.groupChannels.length;
 		if (num > 1) {
 			$('#statusText').text("Waiting for " + num + " more players.");

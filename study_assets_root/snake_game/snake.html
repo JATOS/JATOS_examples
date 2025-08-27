@@ -4,7 +4,7 @@
 <head>
 	<link rel="stylesheet" type="text/css" href="css/snake.css" />
 	<link rel="stylesheet" href="libs/pure-release-0.6.0/pure-min.css">
-	<script src="libs/jquery-1.11.1.min.js"></script>
+	<script	src="libs/jquery-3.7.1.min.js"></script>
 	<script src="jatos.js"></script>
 </head>
 
@@ -94,6 +94,12 @@
 				clearInterval(gameLoop);
 			}
 			gameLoop = setInterval(paint, 80);
+
+		  window.addEventListener("keydown", function(e) {
+        if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+          e.preventDefault();
+        }
+      }, false);
 
 			// Lets add the keyboard controls now
 			$(document).keydown(function (e) {
@@ -351,7 +357,6 @@
 			var resultJson = JSON.stringify(resultData);
 			jatos.submitResultData(resultJson, jatos.endStudy);
 		});
-
 	</script>
 </body>
 

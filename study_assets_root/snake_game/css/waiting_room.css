@@ -10,13 +10,13 @@ p {
 }
 
 #memberCounterRow, #statusRow, #buttonRow, #memberCounterRow {
-    margin: 0 auto;
+  margin: 0 auto;
 	margin-top: 1em;
 	font-size: 2em;
 	text-align: center;
 }
 
-#memberCounter {
+#memberCounter, #groupId {
 	font-size: 4em;
 	font-weight: bold;
 	color: #666;
@@ -24,18 +24,18 @@ p {
 
 .buttonJoin {
 	color: white;
-    background: rgb(66, 184, 221); /* this is a light blue */
+	background: rgb(66, 184, 221); /* this is a light blue */
 }
 
 .buttonLeave {
 	color: white;
-    background: rgb(223, 117, 20); /* this is orange */
+	background: rgb(223, 117, 20); /* this is orange */
 	display: none;
 }
 
 .buttonReady {
 	color: white;
-    background: rgb(28, 184, 65); /* this is a light green */
+	background: rgb(28, 184, 65); /* this is a light green */
 }
 
 #quit {
