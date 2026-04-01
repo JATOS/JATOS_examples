@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="inc_compile">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/gatling-charts-highcharts-bundle-3.2.1/target/inc_compile.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
