@@ -1,0 +1,1 @@
+examples/jatos_load_test_simple.jzip filter=lfs diff=lfs merge=lfs -text
