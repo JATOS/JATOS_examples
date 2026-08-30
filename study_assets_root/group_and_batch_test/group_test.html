@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="libs/pure-release-0.6.0/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="css/test.css"/>
+    <script src="libs/jquery-1.11.1.min.js"></script>
+    <script src="jatos.js"></script>
+</head>
+
+<body>
+
+<div class="pure-menu pure-menu-horizontal">
+    <ul class="pure-menu-list">
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="onJoin()">join</a>
+        </li>
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="onLeave()">leave</a>
+        </li>
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="onSetFixed()">fix</a>
+        </li>
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="onReassignGroup()">reassign</a>
+        </li>
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="onSendMsg()">sendMsg</a>
+        </li>
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="onSendMsgTo()">sendMsgTo</a>
+        </li>
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="groupSessionFind()">Find in Session</a>
+        </li>
+
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+            <a href="#" id="menuLink1" class="pure-menu-link">Update Session</a>
+            <ul class="pure-menu-children">
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionAdd()">add</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionSet()">set</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionSetAll()">setAll</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionRemove()">remove</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionReplace()">replace</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionCopy()">copy</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionMove()">move</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionClear()">clear</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="jatos.endStudy()">endStudy</a>
+        </li>
+    </ul>
+</div>
+
+<div class="output-container" id="properties-container">
+    <h3>Properties</h3>
+    <div id="properties">
+        <table class="pure-table pure-table-horizontal">
+            <tbody>
+            <tr>
+                <td>isConnected</td>
+                <td id="prop-isConnected">-</td>
+                <td>groupSessionWriteScope</td>
+                <td id="prop-groupSessionWriteScope">-</td>
+            </tr>
+            <tr>
+                <td>isGroupOpen</td>
+                <td id="prop-isGroupOpen">-</td>
+                <td>groupSessionVersioning</td>
+                <td id="prop-groupSessionVersioning">-</td>
+            </tr>
+            <tr>
+                <td>groupChannels</td>
+                <td id="prop-groupChannels">-</td>
+                <td>batchProperties.maxActiveMembers</td>
+                <td id="prop-maxActiveMembers">-</td>
+            </tr>
+            <tr>
+                <td>groupMemberId</td>
+                <td id="prop-groupMemberId">-</td>
+                <td>batchProperties.maxTotalMembers</td>
+                <td id="prop-maxTotalMembers">-</td>
+            </tr>
+            <tr>
+                <td>groupMembers</td>
+                <td id="prop-groupMembers">-</td>
+                <td>batchProperties.maxTotalWorkers</td>
+                <td id="prop-maxTotalWorkers">-</td>
+            </tr>
+            <tr>
+                <td>groupResultId</td>
+                <td id="prop-groupResultId">-</td>
+                <td>isMaxActiveMemberOpen</td>
+                <td id="prop-isMaxActiveMemberOpen">-</td>
+            </tr>
+            <tr>
+                <td>groupState</td>
+                <td id="prop-groupState">-</td>
+                <td>isMaxActiveMemberReached</td>
+                <td id="prop-isMaxActiveMemberReached">-</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="pure-g">
+    <div class="pure-u-1-2">
+        <div class="output-container">
+            <h3>Log</h3>
+            <div id="log">
+                <ul></ul>
+            </div>
+        </div>
+    </div>
+    <div class="pure-u-1-2">
+        <div class="output-container">
+            <h3>Group Session</h3>
+            <div id="groupSession">
+                <pre></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<dialog id="group-test-dialog" class="pure-dialog">
+    <form id="group-test-form" class="pure-form pure-form-stacked">
+        <h2 id="group-test-dialog-title"></h2>
+        <div id="arg1-field">
+            <label for="arg1">Path</label>
+            <input id="arg1"
+                   name="arg1"
+                   type="text">
+        </div>
+        <div id="arg2-field">
+            <label for="arg2">Value</label>
+            <textarea id="arg2"
+                      name="arg2"
+                      rows="5"></textarea>
+        </div>
+        <div id="arg3-field">
+            <label for="arg3">Path</label>
+            <input id="arg3"
+                   name="arg3"
+                   type="text">
+        </div>
+        <div id="dialog-msg" class="form-error"></div>
+        <div class="pure-dialog-actions">
+            <button id="cancel-dialog"
+                    type="button"
+                    class="pure-button"
+                    onclick="dialog.close()">
+                Cancel
+            </button>
+            <button type="submit"
+                    class="pure-button pure-button-primary">
+                Go
+            </button>
+        </div>
+    </form>
+</dialog>
+
+
+<script type="text/javascript">
+    var jatosColor = "#aaa";
+    var groupColor = "#44f";
+    var errorColor = "#f00";
+
+    jatos.onLoad(function () {
+        updateProperties();
+    });
+
+    function onJoin() {
+        jatos.joinGroup({
+            "onOpen": onOpen,
+            "onClose": onClose,
+            "onError": onError,
+            "onMessage": onMessage,
+            "onMemberJoin": onMemberJoin,
+            "onMemberOpen": onMemberOpen,
+            "onMemberLeave": onMemberLeave,
+            "onMemberClose": onMemberClose,
+            "onGroupSession": onGroupSession,
+            "onUpdate": onUpdate
+        }).done(function () {
+            appendToLog("jatos.joinGroup deferred resolved", jatosColor);
+            updateProperties();
+            updateGroupSession();
+        }).fail(function (errMsg) {
+            appendToLog(`jatos.joinGroup deferred rejected${errMsg? `: ${errMsg}`: ""}`, errorColor);
+        });
+    }
+
+    function onLeave() {
+        jatos.leaveGroup().done(function () {
+            appendToLog("jatos.leaveGroup deferred resolved", jatosColor);
+            updateProperties();
+            updateGroupSession();
+        }).fail(function () {
+            appendToLog(`jatos.leaveGroup deferred rejected${errMsg? `: ${errMsg}`: ""}`, errorColor);
+        });
+    }
+
+    function onSetFixed() {
+        jatos.setGroupFixed().done(function () {
+            appendToLog("jatos.setGroupFixed deferred resolved", jatosColor);
+            updateProperties();
+        }).fail(function () {
+            appendToLog(`jatos.setGroupFixed deferred rejected${errMsg ? `: ${errMsg}` : ""}`, errorColor);
+        });
+    }
+
+    function onReassignGroup() {
+        jatos.reassignGroup().done(function () {
+            appendToLog("jatos.reassignGroup deferred resolved", jatosColor);
+            updateProperties();
+            updateGroupSession();
+        }).fail(function () {
+            appendToLog(`jatos.reassignGroup deferred rejected${errMsg? `: ${errMsg}`: ""}`, errorColor);
+        });
+    }
+
+    function onOpen() {
+        appendToLog("onOpen callback - " + getStats(), groupColor);
+        updateProperties();
+    }
+
+    function onClose() {
+        appendToLog("onClose callback - " + getStats(), groupColor);
+        updateProperties();
+    }
+
+    function onError(errorMsg) {
+        appendToLog("onError callback: " + errorMsg, errorColor);
+        updateProperties();
+    }
+
+    function onMessage(msg) {
+        appendToLog("onMessage callback: " + msg, groupColor);
+    }
+
+    function onMemberJoin(memberId) {
+        appendToLog("onMemberJoin callback(" + memberId + ") - " + getStats(), groupColor);
+        updateProperties();
+    }
+
+    function onMemberOpen(memberId) {
+        appendToLog("onMemberOpen callback(" + memberId + ") - " + getStats(), groupColor);
+        updateProperties();
+    }
+
+    function onMemberLeave(memberId) {
+        appendToLog("onMemberLeave callback(" + memberId + ") - " + getStats(), groupColor);
+        updateProperties();
+    }
+
+    function onMemberClose(memberId) {
+        appendToLog("onMemberClose callback(" + memberId + ") - " + getStats(), groupColor);
+        updateProperties();
+    }
+
+    function onGroupSession(path) {
+        appendToLog("onGroupSession callback(" + path + ") - " + JSON.stringify(jatos.groupSession.find(path)),
+            groupColor);
+        updateGroupSession();
+    }
+
+    function onUpdate() {
+        appendToLog("onUpdate callback - " + getStats(), groupColor);
+        updateProperties();
+    }
+
+    function onSendMsg() {
+        const defaultMsg = "Msg from " + jatos.groupMemberId;
+        openDialog("sendMsg",
+            {showArg2: true, arg2Label: "Message", parseJsonArg2: false, prefillArg2: defaultMsg},
+            ({arg2}) => {
+                const msg = arg2 ?? "";
+                jatos.sendGroupMsg(msg);
+                appendToLog(`jatos.sendGroupMsg("${typeof msg === 'object' ? JSON.stringify(msg) : msg}")`, jatosColor);
+                return jatos.jQuery.Deferred().resolve().promise();
+            });
+    }
+
+    function onSendMsgTo() {
+        const defaultRecipient = jatos.groupMembers.find(element => String(element) !== String(jatos.groupMemberId)) ?? "";
+        const defaultMsg = "Msg from " + jatos.groupMemberId;
+        openDialog("sendMsgTo",
+            {
+                showArg1: true,
+                showArg2: true,
+                arg1Label: "Recipient",
+                arg2Label: "Message",
+                parseJsonArg2: false,
+                prefillArg1: defaultRecipient,
+                prefillArg2: defaultMsg
+            },
+            ({arg1, arg2}) => {
+                const recipient = arg1;
+                const msg = arg2 ?? "";
+                jatos.sendGroupMsgTo(recipient, msg);
+                appendToLog(`jatos.sendGroupMsgTo(${recipient}, "${typeof msg === 'object' ? JSON.stringify(msg) : msg}")`, jatosColor);
+                return jatos.jQuery.Deferred().resolve().promise();
+            });
+    }
+
+    const dialog = document.querySelector("#group-test-dialog");
+    const dialogTitle = document.querySelector("#group-test-dialog-title");
+    const form = document.querySelector("#group-test-form");
+    const arg1Field = document.querySelector("#arg1-field");
+    const arg1LabelElem = document.querySelector("label[for='arg1']");
+    const arg2Field = document.querySelector("#arg2-field");
+    const arg2LabelElem = document.querySelector("label[for='arg2']");
+    const arg3Field = document.querySelector("#arg3-field");
+    const arg3LabelElem = document.querySelector("label[for='arg3']");
+    const dialogMsg = document.querySelector("#dialog-msg");
+
+    function openDialog(actionName, {
+        showArg1 = false,
+        showArg2 = false,
+        showArg3 = false,
+        arg1Label = "Path",
+        arg2Label = "Value",
+        arg3Label = "Path",
+        parseJsonArg2 = true,
+        prefillArg1 = "",
+        prefillArg2 = "",
+        prefillArg3 = ""
+    }, sessionFn) {
+        form.reset();
+        dialogMsg.textContent = "";
+        arg1Field.hidden = !showArg1;
+        arg1LabelElem.textContent = arg1Label;
+        arg2Field.hidden = !showArg2;
+        arg2LabelElem.textContent = arg2Label;
+        arg3Field.hidden = !showArg3;
+        arg3LabelElem.textContent = arg3Label;
+        dialogTitle.textContent = actionName.toUpperCase();
+
+        if (showArg1) {
+            document.querySelector("#arg1").value = prefillArg1 ?? "";
+        }
+        if (showArg2) {
+            const val = prefillArg2;
+            document.querySelector("#arg2").value = typeof val === "object" ? JSON.stringify(val, null, 2) : (val ?? "");
+        }
+        if (showArg3) {
+            document.querySelector("#arg3").value = prefillArg3 ?? "";
+        }
+
+        dialog.showModal();
+
+        form.onsubmit = event => {
+            event.preventDefault();
+            dialogMsg.textContent = "";
+            const data = new FormData(form);
+            const arg1 = data.get("arg1");
+            const rawArg2 = data.get("arg2");
+            const arg3 = data.get("arg3");
+
+            let arg2;
+            if (showArg2) {
+                if (parseJsonArg2) {
+                    const result = parseJsonFieldValue(rawArg2);
+                    if (result.error) {
+                        dialogMsg.textContent = "JSON parse error: " + result.error;
+                        return;
+                    }
+                    arg2 = result.value;
+                } else {
+                    arg2 = rawArg2;
+                }
+            }
+
+            sessionFn({arg1, arg2, arg3})
+                .done(() => appendToLog(` jatos.groupSession.${actionName} deferred resolved`, jatosColor))
+                .fail((err) => appendToLog(` jatos.groupSession.${actionName} deferred rejected: ${err}`, errorColor));
+
+            dialog.close();
+        };
+    }
+
+    function groupSessionFind() {
+        form.reset();
+        dialogMsg.textContent = "";
+        arg1Field.hidden = false;
+        arg2Field.hidden = true;
+        arg3Field.hidden = true;
+        dialogTitle.textContent = "find";
+        document.querySelector("#arg1").value = isGroupSessionWriteScopeMember() ? "/" + jatos.groupMemberId : "/";
+
+        dialog.showModal();
+
+        form.onsubmit = event => {
+            event.preventDefault();
+            dialogMsg.textContent = "";
+
+            const data = new FormData(form);
+            const path = data.get("arg1");
+            const result = jatos.groupSession.find(path);
+            dialogMsg.innerHTML = `Result: <pre><code>${getStringifiedSession(result)}</code></pre>`;
+            appendToLog(`jatos.groupSession.find("${path}")`, jatosColor);
+            appendToLog(`result: ${result}`, jatosColor);
+        }
+    }
+
+    function onUpdateSessionAdd() {
+        const prefillArg1 = isGroupSessionWriteScopeMember() ? "/" + jatos.groupMemberId : "/";
+        openDialog("add",
+            {showArg1: true, showArg2: true, prefillArg1: prefillArg1, prefillArg2: "{}"},
+            ({arg1, arg2}) => jatos.groupSession.add(arg1, arg2));
+    }
+
+    function onUpdateSessionSet() {
+        const prefillArg1 = isGroupSessionWriteScopeMember() ? jatos.groupMemberId : "";
+        openDialog("set",
+            {showArg1: true, showArg2: true, prefillArg1: prefillArg1, prefillArg2: "{}"},
+            ({arg1, arg2}) => jatos.groupSession.set(arg1, arg2));
+    }
+
+    function onUpdateSessionSetAll() {
+        openDialog("setAll",
+            {showArg2: true, prefillArg2: "{}"},
+            ({arg2}) => jatos.groupSession.setAll(arg2));
+    }
+
+    function onUpdateSessionRemove() {
+        const prefillArg1 = isGroupSessionWriteScopeMember() ? "/" + jatos.groupMemberId : "/";
+        openDialog("remove",
+            {showArg1: true, prefillArg1: prefillArg1,},
+            ({arg1}) => jatos.groupSession.remove(arg1));
+    }
+
+    function onUpdateSessionReplace() {
+        const prefillArg1 = isGroupSessionWriteScopeMember() ? "/" + jatos.groupMemberId : "/";
+        openDialog("replace",
+            {showArg1: true, showArg2: true, prefillArg1: prefillArg1, prefillArg2: "{}"},
+            ({arg1, arg2}) => jatos.groupSession.replace(arg1, arg2));
+    }
+
+    function onUpdateSessionMove() {
+        const prefillArg1 = isGroupSessionWriteScopeMember() ? "/" + jatos.groupMemberId : "/";
+        const prefillArg3 = prefillArg1
+        openDialog("move",
+            {showArg1: true, showArg3: true, prefillArg1: prefillArg1, prefillArg3: prefillArg3},
+            ({arg1, arg3}) => jatos.groupSession.move(arg1, arg3));
+    }
+
+    function onUpdateSessionCopy() {
+        const prefillArg1 = isGroupSessionWriteScopeMember() ? "/" + jatos.groupMemberId : "/";
+        const prefillArg3 = prefillArg1
+        openDialog("copy",
+            {showArg1: true, showArg3: true, prefillArg1: prefillArg1, prefillArg3: prefillArg3},
+            ({arg1, arg3}) => jatos.groupSession.copy(arg1, arg3));
+    }
+
+    function onUpdateSessionClear() {
+        openDialog("clear", {}, () => jatos.groupSession.clear());
+    }
+
+    function updateGroupSession() {
+        $("#groupSession pre").text(getStringifiedSession(jatos.groupSession.getAll()));
+    }
+
+    function isGroupSessionWriteScopeMember() {
+        return jatos.studyProperties.groupSessionWriteScope === "MEMBER" && jatos.groupMemberId !== null;
+    }
+
+    function parseJsonFieldValue(rawValue) {
+        if (!rawValue?.trim()) {
+            return {value: undefined};
+        }
+        try {
+            return {value: JSON.parse(rawValue)};
+        } catch (err) {
+            return {error: err.message};
+        }
+    }
+
+    function getStringifiedSession(session) {
+        return JSON.stringify(
+            session,
+            (key, value) => value === undefined ? null : value,
+            2);
+    }
+
+    function updateProperties() {
+        $("#prop-groupSessionWriteScope").text(jatos.studyProperties?.groupSessionWriteScope ?? "-");
+        $("#prop-groupChannels").text(Array.isArray(jatos.groupChannels) ? JSON.stringify(jatos.groupChannels) : "-");
+        $("#prop-groupMemberId").text(jatos.groupMemberId ?? "-");
+        $("#prop-groupMembers").text(Array.isArray(jatos.groupMembers) ? JSON.stringify(jatos.groupMembers) : "-");
+        $("#prop-groupResultId").text(jatos.groupResultId ?? "-");
+        $("#prop-groupState").text(jatos.getGroupState() ?? "-");
+        $("#prop-groupSessionVersioning").text(String(jatos.groupSessionVersioning));
+        $("#prop-maxActiveMembers").text(jatos.batchProperties?.maxActiveMembers ?? "-");
+        $("#prop-maxTotalMembers").text(jatos.batchProperties?.maxTotalMembers ?? "-");
+        $("#prop-maxTotalWorkers").text(jatos.batchProperties?.maxTotalWorkers ?? "-");
+        $("#prop-isConnected").text(String(jatos.isConnected()));
+        $("#prop-isGroupOpen").text(String(jatos.isGroupOpen()));
+        $("#prop-isMaxActiveMemberOpen").text(String(jatos.isMaxActiveMemberOpen()));
+        $("#prop-isMaxActiveMemberReached").text(String(jatos.isMaxActiveMemberReached()));
+    }
+
+    function getStats() {
+        return `channels ${jatos.groupChannels}, memberId ${jatos.groupMemberId}, members ${jatos.groupMembers}, groupResultId ${jatos.groupResultId}`;
+    }
+
+    function appendToLog(text, color) {
+        $("#log ul").append('<li>' + text + '</li>');
+        $("#log li").last().css('color', color);
+        // Scroll to bottom
+        $("#log").scrollTop($("#log")[0].scrollHeight);
+    }
+</script>
+</body>
+
+</html>

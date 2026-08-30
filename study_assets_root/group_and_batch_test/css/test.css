@@ -1,0 +1,108 @@
+body {
+	margin: 0px;
+	padding: 0px;
+	background-color: #eee;
+}
+
+#content {
+	padding-left: 2em;
+	padding-right: 2em;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.output-container {
+	margin: 10px 8px;
+}
+
+.output-container h3 {
+	margin: 0 0 5px 0;
+}
+
+#properties-container {
+	margin-top: 10px;
+}
+
+#properties {
+	background-color: #fff;
+}
+
+#properties table {
+	width: 100%;
+	font-size: 0.85em;
+}
+
+#properties td {
+	padding: 4px 10px;
+}
+
+#properties td:nth-child(1),
+#properties td:nth-child(3) {
+	font-weight: bold;
+	width: 25%;
+}
+
+#properties td:nth-child(2),
+#properties td:nth-child(4) {
+	width: 25%;
+}
+
+#log,
+#groupSession {
+	overflow-y: scroll;
+	height: 400px;
+	background-color: #fff;
+	box-sizing: border-box;
+}
+
+#log li {
+	list-style-type: none;
+}
+
+#groupSession pre {
+	margin: 0;
+	padding: 10px;
+}
+
+#sendMsgForm {
+	margin-top: 10px;
+}
+
+#endStudyButton {
+	margin-top: 50px;
+	bottom: 1em;
+	left: 2em;
+}
+
+.pure-menu-children {
+	min-width: 180px;
+}
+
+.pure-dialog {
+	width: min(90vw, 32rem);
+	padding: 1.5rem;
+	border: 0;
+	border-radius: 6px;
+	box-shadow: 0 10px 35px rgb(0 0 0 / 30%);
+}
+
+.pure-dialog::backdrop {
+	background: rgb(0 0 0 / 50%);
+}
+
+.pure-dialog h2 {
+	margin-top: 0;
+}
+
+.pure-dialog input,
+.pure-dialog textarea {
+	box-sizing: border-box;
+	width: 100%;
+}
+
+.pure-dialog-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	margin-top: 1.5rem;
+}

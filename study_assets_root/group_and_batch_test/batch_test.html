@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Batch Session Test</title>
+    <link rel="stylesheet" href="libs/pure-release-0.6.0/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="css/test.css"/>
+    <script src="libs/jquery-1.11.1.min.js"></script>
+    <script src="jatos.js"></script>
+</head>
+
+<body>
+
+<div class="pure-menu pure-menu-horizontal">
+    <ul class="pure-menu-list">
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="batchSessionFind()">Find in Session</a>
+        </li>
+
+        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+            <a href="#" id="menuLink1" class="pure-menu-link">Update Session</a>
+            <ul class="pure-menu-children">
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionAdd()">add</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionSet()">set</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionSetAll()">setAll</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionRemove()">remove</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionReplace()">replace</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionCopy()">copy</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionMove()">move</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="#" class="pure-menu-link" onclick="onUpdateSessionClear()">clear</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="pure-menu-item">
+            <a href="#" class="pure-menu-link" onclick="jatos.endStudy()">endStudy</a>
+        </li>
+    </ul>
+</div>
+
+<div class="output-container" id="properties-container">
+    <h3>Properties</h3>
+    <div id="properties">
+        <table class="pure-table pure-table-horizontal">
+            <tbody>
+            <tr>
+                <td>isConnected</td>
+                <td id="prop-isConnected">-</td>
+                <td>batchSessionVersioning</td>
+                <td id="prop-batchSessionVersioning">-</td>
+            </tr>
+            <tr>
+                <td>batchId</td>
+                <td id="prop-batchId">-</td>
+                <td>batchTitle</td>
+                <td id="prop-batchTitle">-</td>
+            </tr>
+            <tr>
+                <td>studyId</td>
+                <td id="prop-studyId">-</td>
+                <td>studyTitle</td>
+                <td id="prop-studyTitle">-</td>
+            </tr>
+            <tr>
+                <td>workerId</td>
+                <td id="prop-workerId">-</td>
+                <td>studyResultId</td>
+                <td id="prop-studyResultId">-</td>
+            </tr>
+            <tr>
+                <td>batchProperties.maxTotalWorkers</td>
+                <td id="prop-maxTotalWorkers">-</td>
+                <td></td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="pure-g">
+    <div class="pure-u-1-2">
+        <div class="output-container">
+            <h3>Log</h3>
+            <div id="log">
+                <ul></ul>
+            </div>
+        </div>
+    </div>
+    <div class="pure-u-1-2">
+        <div class="output-container">
+            <h3>Batch Session</h3>
+            <div id="batchSession">
+                <pre></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<dialog id="batch-test-dialog" class="pure-dialog">
+    <form id="batch-test-form" class="pure-form pure-form-stacked">
+        <h2 id="batch-test-dialog-title"></h2>
+        <div id="arg1-field">
+            <label for="arg1">Path</label>
+            <input id="arg1"
+                   name="arg1"
+                   type="text">
+        </div>
+        <div id="arg2-field">
+            <label for="arg2">Value</label>
+            <textarea id="arg2"
+                      name="arg2"
+                      rows="5"></textarea>
+        </div>
+        <div id="arg3-field">
+            <label for="arg3">Path</label>
+            <input id="arg3"
+                   name="arg3"
+                   type="text">
+        </div>
+        <div id="dialog-msg" class="form-error"></div>
+        <div class="pure-dialog-actions">
+            <button id="cancel-dialog"
+                    type="button"
+                    class="pure-button"
+                    onclick="dialog.close()">
+                Cancel
+            </button>
+            <button type="submit"
+                    class="pure-button pure-button-primary">
+                Go
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<script type="text/javascript">
+    var jatosColor = "#aaa";
+    var batchColor = "#44f";
+    var errorColor = "#f00";
+
+    jatos.onLoad(function () {
+        updateProperties();
+        updateBatchSession();
+
+        jatos.onBatchSession(function (path, op) {
+            appendToLog(`onBatchSession callback(path: "${path}", op: "${op}") - ` + JSON.stringify(jatos.batchSession.find(path)), batchColor);
+            updateBatchSession();
+        });
+
+        jatos.onConnected(function () {
+            appendToLog("onConnected callback: WebSocket batch channel alive", batchColor);
+            updateProperties();
+        });
+
+        jatos.onDisconnected(function () {
+            appendToLog("onDisconnected callback: WebSocket batch channel disconnected", errorColor);
+            updateProperties();
+        });
+    });
+
+    const dialog = document.querySelector("#batch-test-dialog");
+    const dialogTitle = document.querySelector("#batch-test-dialog-title");
+    const form = document.querySelector("#batch-test-form");
+    const arg1Field = document.querySelector("#arg1-field");
+    const arg1LabelElem = document.querySelector("label[for='arg1']");
+    const arg2Field = document.querySelector("#arg2-field");
+    const arg2LabelElem = document.querySelector("label[for='arg2']");
+    const arg3Field = document.querySelector("#arg3-field");
+    const arg3LabelElem = document.querySelector("label[for='arg3']");
+    const dialogMsg = document.querySelector("#dialog-msg");
+
+    function openDialog(actionName, {
+        showArg1 = false,
+        showArg2 = false,
+        showArg3 = false,
+        arg1Label = "Path",
+        arg2Label = "Value",
+        arg3Label = "Path",
+        parseJsonArg2 = true,
+        prefillArg1 = "",
+        prefillArg2 = "",
+        prefillArg3 = ""
+    }, sessionFn) {
+        form.reset();
+        dialogMsg.textContent = "";
+        arg1Field.hidden = !showArg1;
+        arg1LabelElem.textContent = arg1Label;
+        arg2Field.hidden = !showArg2;
+        arg2LabelElem.textContent = arg2Label;
+        arg3Field.hidden = !showArg3;
+        arg3LabelElem.textContent = arg3Label;
+        dialogTitle.textContent = actionName.toUpperCase();
+
+        if (showArg1) {
+            document.querySelector("#arg1").value = prefillArg1 ?? "";
+        }
+        if (showArg2) {
+            const val = prefillArg2;
+            document.querySelector("#arg2").value = typeof val === "object" ? JSON.stringify(val, null, 2) : (val ?? "");
+        }
+        if (showArg3) {
+            document.querySelector("#arg3").value = prefillArg3 ?? "";
+        }
+
+        dialog.showModal();
+
+        form.onsubmit = event => {
+            event.preventDefault();
+            dialogMsg.textContent = "";
+            const data = new FormData(form);
+            const arg1 = data.get("arg1");
+            const rawArg2 = data.get("arg2");
+            const arg3 = data.get("arg3");
+
+            let arg2;
+            if (showArg2) {
+                if (parseJsonArg2) {
+                    const result = parseJsonFieldValue(rawArg2);
+                    if (result.error) {
+                        dialogMsg.textContent = "JSON parse error: " + result.error;
+                        return;
+                    }
+                    arg2 = result.value;
+                } else {
+                    arg2 = rawArg2;
+                }
+            }
+
+            sessionFn({arg1, arg2, arg3})
+                .done(() => appendToLog(`jatos.batchSession.${actionName} deferred resolved`, jatosColor))
+                .fail((err) => appendToLog(`jatos.batchSession.${actionName} deferred rejected: ${err}`, errorColor));
+
+            dialog.close();
+        };
+    }
+
+    function batchSessionFind() {
+        form.reset();
+        dialogMsg.textContent = "";
+        arg1Field.hidden = false;
+        arg2Field.hidden = true;
+        arg3Field.hidden = true;
+        dialogTitle.textContent = "FIND";
+        document.querySelector("#arg1").value = "/";
+
+        dialog.showModal();
+
+        form.onsubmit = event => {
+            event.preventDefault();
+            dialogMsg.textContent = "";
+
+            const data = new FormData(form);
+            const path = data.get("arg1");
+            const result = jatos.batchSession.find(path);
+            dialogMsg.innerHTML = `Result: <pre><code>${getStringifiedSession(result)}</code></pre>`;
+            appendToLog(`jatos.batchSession.find("${path}")`, jatosColor);
+            appendToLog(`result: ${JSON.stringify(result)}`, jatosColor);
+        };
+    }
+
+    function onUpdateSessionAdd() {
+        openDialog("add",
+            {showArg1: true, showArg2: true, prefillArg1: "/", prefillArg2: "{}"},
+            ({arg1, arg2}) => jatos.batchSession.add(arg1, arg2));
+    }
+
+    function onUpdateSessionSet() {
+        openDialog("set",
+            {showArg1: true, showArg2: true, arg1Label: "Name (Key)", prefillArg1: "myKey", prefillArg2: "{}"},
+            ({arg1, arg2}) => jatos.batchSession.set(arg1, arg2));
+    }
+
+    function onUpdateSessionSetAll() {
+        openDialog("setAll",
+            {showArg2: true, prefillArg2: "{}"},
+            ({arg2}) => jatos.batchSession.setAll(arg2));
+    }
+
+    function onUpdateSessionRemove() {
+        openDialog("remove",
+            {showArg1: true, prefillArg1: "/"},
+            ({arg1}) => jatos.batchSession.remove(arg1));
+    }
+
+    function onUpdateSessionReplace() {
+        openDialog("replace",
+            {showArg1: true, showArg2: true, prefillArg1: "/", prefillArg2: "{}"},
+            ({arg1, arg2}) => jatos.batchSession.replace(arg1, arg2));
+    }
+
+    function onUpdateSessionMove() {
+        openDialog("move",
+            {
+                showArg1: true,
+                showArg3: true,
+                arg1Label: "From Path",
+                arg3Label: "To Path",
+                prefillArg1: "/",
+                prefillArg3: "/"
+            },
+            ({arg1, arg3}) => jatos.batchSession.move(arg1, arg3));
+    }
+
+    function onUpdateSessionCopy() {
+        openDialog("copy",
+            {
+                showArg1: true,
+                showArg3: true,
+                arg1Label: "From Path",
+                arg3Label: "To Path",
+                prefillArg1: "/",
+                prefillArg3: "/"
+            },
+            ({arg1, arg3}) => jatos.batchSession.copy(arg1, arg3));
+    }
+
+    function onUpdateSessionClear() {
+        openDialog("clear", {}, () => jatos.batchSession.clear());
+    }
+
+    function updateBatchSession() {
+        $("#batchSession pre").text(getStringifiedSession(jatos.batchSession.getAll()));
+    }
+
+    function parseJsonFieldValue(rawValue) {
+        if (!rawValue?.trim()) {
+            return {value: undefined};
+        }
+        try {
+            return {value: JSON.parse(rawValue)};
+        } catch (err) {
+            return {error: err.message};
+        }
+    }
+
+    function getStringifiedSession(session) {
+        return JSON.stringify(
+            session,
+            (key, value) => value === undefined ? null : value,
+            2);
+    }
+
+    function updateProperties() {
+        $("#prop-isConnected").text(String(jatos.isConnected()));
+        $("#prop-batchSessionVersioning").text(String(jatos.batchSessionVersioning));
+        $("#prop-batchId").text(jatos.batchId ?? "-");
+        $("#prop-batchTitle").text(jatos.batchProperties?.title ?? "-");
+        $("#prop-studyId").text(jatos.studyId ?? "-");
+        $("#prop-studyTitle").text(jatos.studyProperties?.title ?? "-");
+        $("#prop-workerId").text(jatos.workerId ?? "-");
+        $("#prop-studyResultId").text(jatos.studyResultId ?? "-");
+        $("#prop-maxTotalWorkers").text(jatos.batchProperties?.maxTotalWorkers ?? "-");
+        $("#prop-maxTotalMembers").text(jatos.batchProperties?.maxTotalMembers ?? "-");
+    }
+
+    function appendToLog(text, color) {
+        $("#log ul").append('<li>' + text + '</li>');
+        $("#log li").last().css('color', color);
+        // Scroll to bottom
+        $("#log").scrollTop($("#log")[0].scrollHeight);
+    }
+</script>
+</body>
+
+</html>
