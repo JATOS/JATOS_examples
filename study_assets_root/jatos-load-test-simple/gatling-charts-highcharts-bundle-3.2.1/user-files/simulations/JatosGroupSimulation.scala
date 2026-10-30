@@ -8,16 +8,12 @@ import io.gatling.jdbc.Predef._
 
 import java.net.URLDecoder
 
-class JatosGroupSimulation extends Simulation {
+class JatosGroupSimulation extends Simulation with CheckedJatos {
 
-  val host = "www.example.com"
-  val studyCode = "bOtlm8bSLXI"
-  val componentUuid1 = "887e0913-d6ad-4620-b791-d85650ce5de6"
-  val componentUuid2 = "2997d569-25a6-4ebb-9372-d87369181438"
 
   val httpProtocol = http
-    .baseUrl(s"https://$host")
-    .wsBaseUrl(s"wss://$host")
+    .baseUrl(baseUrl)
+    .wsBaseUrl(wsBaseUrl)
     .inferHtmlResources()
     .acceptHeader("*/*")
     .acceptEncodingHeader("gzip, deflate")
@@ -41,48 +37,67 @@ class JatosGroupSimulation extends Simulation {
 
 
   val scn = scenario("JatosGroupSimulation")
+    .exec(identify)
     .exec(session => session.set("componentUuid1", componentUuid1))
     .exec(session => session.set("componentUuid2", componentUuid2))
     .exec(
-      http("Start").get(s"/publix/$studyCode").headers(header_html)
+      http("Start").get(s"/publix/$studyCode").headers(header_html).check(status.is(200))
         // Get study result UUID from the JATOS_ID cookie and save it in the session
         .check(headerRegex("Set-Cookie", ".*studyResultUuid=([a-zA-Z0-9-]+)&.*").saveAs("studyResultUuid"))
-    )
+    ).exec(failFast)
     .exec(session => {
       val studyResultUuid = session("studyResultUuid").as[String]
       println(s"studyResultUuid: $studyResultUuid")
       session
     })
     .exec(
-      http("Get init data").get("/publix/${studyResultUuid}/${componentUuid1}/initData").headers(header_json)
-    )
+      http("Get init data")
+        .get("/publix/${studyResultUuid}/${componentUuid1}/initData")
+        .headers(header_json)
+        .check(status.is(200))
+        .check(
+          jsonPath("$.studyCode").is(studyCode),
+          jsonPath("$.studyProperties.uuid").is(expectedStudyUuid),
+          jsonPath("$.componentProperties.uuid").is(componentUuid1),
+          jsonPath("$.componentList[*].uuid").findAll.transform(_.contains(componentUuid1)).is(true),
+          jsonPath("$.componentList[*].uuid").findAll.transform(_.contains(componentUuid2)).is(true))
+    ).exec(failFast)
     .exec(
       ws("Open batch channel").wsName("batchChannel").connect("/publix/${studyResultUuid}/batch/open")
-    )
+    ).exec(session => if (session.isFailed) session else session.set("batchOpen", true)).exec(failFast)
     .exec(
-      http("Heartbeat").post("/publix/${studyResultUuid}/heartbeat").headers(header_ajax)
-    )
+      http("Heartbeat").post("/publix/${studyResultUuid}/heartbeat").headers(header_ajax).check(status.is(200))
+    ).exec(failFast)
     .exec(
       ws("Join group").wsName("groupChannel").connect("/publix/${studyResultUuid}/group/join")
-    ).pause(5 seconds)
+    ).exec(session => if (session.isFailed) session else session.set("groupOpen", true)).exec(failFast).pause(5 seconds)
     .exec(
-      http("Reassign group").get("/publix/${studyResultUuid}/group/reassign").headers(header_ajax)
-    ).pause(5 seconds)
+      http("Reassign group").get("/publix/${studyResultUuid}/group/reassign").headers(header_ajax).check(status.is(200))
+    ).exec(failFast).pause(5 seconds)
     .exec(
-      http("Leave group").get("/publix/${studyResultUuid}/group/leave").headers(header_ajax)
-    ).pause(5 seconds)
+      http("Leave group").get("/publix/${studyResultUuid}/group/leave").headers(header_ajax).check(status.is(200))
+    ).exec(failFast).pause(5 seconds)
     .exec(
-      http("Post study session data").post("/publix/${studyResultUuid}/studySessionData").headers(header_ajax).body(StringBody("""{"foo":"bar"}"""))
-    )
+      http("Post study session data")
+        .post("/publix/${studyResultUuid}/studySessionData")
+        .headers(header_ajax)
+        .body(StringBody("""{"testRun":"${testRun}","participant":"${participant}","foo":"bar"}"""))
+        .check(status.is(200))
+    ).exec(failFast)
     .exec(
-      http("Post results").post("/publix/${studyResultUuid}/${componentUuid1}/resultData").headers(header_ajax).body(StringBody("""{"foo":"bar"}"""))
-    )
+      http("Post results")
+        .post("/publix/${studyResultUuid}/${componentUuid1}/resultData")
+        .headers(header_ajax)
+        .body(StringBody(resultBody(componentUuid1, 5000)))
+        .check(status.is(200))
+    ).exec(failFast)
     .exec(
-      http("Finish study").get("/publix/${studyResultUuid}/end").headers(header_ajax)
-    )
-    .exec(ws("Close batch channel").wsName("batchChannel").close)
+      http("Finish study").get("/publix/${studyResultUuid}/end").headers(header_ajax).check(status.is(200))
+    ).exec(failFast)
+    .exec(ws("Close batch channel").wsName("batchChannel").close).exec(session => session.set("batchOpen", false)).exec(failFast)
 
-  setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+  setUp(scn.inject(atOnceUsers(users))).protocols(httpProtocol)
+    .assertions(global.failedRequests.count.is(0L))
   //  setUp(scn.inject(rampUsersPerSec(0.1) to (0.3) during (600 seconds))).protocols(httpProtocol)
   //  setUp(scn.inject(constantConcurrentUsers(20) during (6000 seconds))).protocols(httpProtocol)
   //  setUp(scn.inject(rampConcurrentUsers(0) to (100) during (600 seconds))).protocols(httpProtocol)
